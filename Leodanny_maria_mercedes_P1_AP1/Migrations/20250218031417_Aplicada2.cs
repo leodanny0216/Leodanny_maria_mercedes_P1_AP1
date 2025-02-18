@@ -33,6 +33,7 @@ namespace Leodanny_maria_mercedes_P1_AP1.Migrations
         {
             migrationBuilder.DropTable(
                 name: "Reportes");
+
         }
     }
 }
