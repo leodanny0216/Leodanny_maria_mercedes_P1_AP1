@@ -1,0 +1,90 @@
+﻿@page "/Reportes/Edit/{ReporteId:int}"
+@inject NavigationManager Navigation
+@inject ServicesReportes ReportesService
+@rendermode InteractiveServer
+
+<EditForm Model="reporte" OnValidSubmit="Actualizar">
+    <DataAnnotationsValidator />
+    <div class="card shadow-lg border-0" style="background-color: white;">
+
+        <div class="card-header bg-primary text-center text-white py-2 rounded">
+            <h3 style="font-weight: bold;">Modificar Reporte</h3>
+        </div>
+
+        <div class="card-body">
+            <!-- ReporteId -->
+            <div class="mb-3">
+                <label for="reporteId" class="form-label">ReporteId:</label>
+                <InputNumber id="reporteId" @bind-Value="reporte.ReporteId" class="form-control" disabled />
+            </div>
+
+            <!-- Persona -->
+            <div class="mb-3">
+                <label for="Persona" class="form-label">Persona:</label>
+                <InputText id="Persona" @bind-Value="reporte.Persona" class="form-control" />
+                <ValidationMessage For="@(() => reporte.Persona)" />
+            </div>
+
+            <!-- Observación -->
+            <div class="mb-3">
+                <label for="Observacion" class="form-label">Observación:</label>
+                <InputText id="Observacion" @bind-Value="reporte.Observacion" class="form-control" />
+                <ValidationMessage For="@(() => reporte.Observacion)" />
+            </div>
+
+            <!-- Monto -->
+            <div class="mb-3">
+                <label for="Monto" class="form-label">Monto:</label>
+                <InputNumber id="Monto" @bind-Value="reporte.Monto" class="form-control" />
+                <ValidationMessage For="@(() => reporte.Monto)" />
+            </div>
+
+            <!-- Fecha -->
+            <div class="mb-3">
+                <label for="Fecha" class="form-label">Fecha:</label>
+                <InputDate id="Fecha" @bind-Value="reporte.Fecha" class="form-control" />
+                <ValidationMessage For="@(() => reporte.Fecha)" />
+            </div>
+        </div>
+
+        <div class="card-footer d-flex justify-content-center">
+            <div class="btn-group">
+                <button type="submit" class="btn btn-outline-success ml-2">
+                    <span class="bi bi-check-circle-fill"></span> Actualizar
+                </button>
+                <button type="button" class="btn btn-outline-danger ml-2" @onclick="Retroceder">
+                    <span class="bi bi-arrow-bar-left"></span> Retroceder
+                </button>
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+@code {
+    [Parameter] public int ReporteId { get; set; }
+    private reportes? reporte { get; set; } = new reportes();
+    private bool guardo;
+
+    protected override async Task OnInitializedAsync()
+    {
+        reporte = await ReportesService.Buscar(ReporteId);
+        if (reporte == null)
+        {
+            Navigation.NavigateTo("/Reportes/Index");
+        }
+    }
+
+    private async Task Actualizar()
+    {
+        guardo = await ReportesService.Modificar(reporte);
+        if (guardo)
+        {
+            Navigation.NavigateTo("/Reportes/Index");
+        }
+    }
+
+    private void Retroceder()
+    {
+        Navigation.NavigateTo("/Reportes/Index");
+    }
+}
