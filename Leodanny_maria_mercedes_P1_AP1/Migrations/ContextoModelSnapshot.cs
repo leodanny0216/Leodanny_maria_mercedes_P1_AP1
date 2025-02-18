@@ -49,7 +49,6 @@ namespace Leodanny_maria_mercedes_P1_AP1.Migrations
                     b.HasKey("ReporteId");
 
                     b.ToTable("Reportes");
-
                 });
 #pragma warning restore 612, 618
         }
