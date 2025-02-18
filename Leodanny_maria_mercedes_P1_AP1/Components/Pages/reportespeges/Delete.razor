@@ -1,0 +1,73 @@
+﻿@page "/Reportes/Delete/{ReporteId:int}"
+@using Leodanny_maria_mercedes_P1_AP1.Services
+@inject NavigationManager NavigationManager
+@inject ServicesReportes ServicesReportes
+@rendermode InteractiveServer
+
+<PageTitle>Eliminar reportes</PageTitle>
+
+<div class="container">
+    <div class="card shadow-lg border-0" style="background-color: white;">
+        <div class="card-header bg-danger text-center text-white py-2 rounded">
+            <h3><strong>Eliminar reportes</strong></h3>
+        </div>
+
+        <div class="card-body">
+            @if (reportes != null)
+            {
+                <p><strong>ReporteId:</strong> @reportes.ReporteId</p>
+                <p><strong>Persona:</strong> @reportes.Persona</p>
+                <p><strong>Observación:</strong> @reportes.Observacion</p>
+                <p><strong>Monto:</strong> @reportes.Monto</p>
+                <p><strong>Fecha:</strong> @reportes.Fecha.ToShortDateString()</p>
+            }
+            else
+            {
+                <p class="text-center text-danger">Aporte no encontrado.</p>
+            }
+        </div>
+
+        @if (reportes != null)
+        {
+            <div class="card-footer text-center">
+                <button type="button" class="btn btn-outline-danger" @onclick="EliminarReporte">
+                    <i class="bi bi-trash-fill"></i> Eliminar
+                </button>
+                <button type="button" class="btn btn-outline-secondary" @onclick="Volver">
+                    <i class="bi bi-arrow-left-circle"></i> Retroceder
+                </button>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public int reporteId { get; set; }
+    private reportes reportes;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (reporteId > 0)
+        {
+            reportes = await ServicesReportes.Buscar(reporteId);
+        }
+    }
+
+    public async Task EliminarReporte()
+    {
+        if (reportes == null)
+        {
+            return;
+        }
+        if (await ServicesReportes.Eliminar(reporteId))
+        {
+            Volver();
+        }
+    }
+
+    private void Volver()
+    {
+        NavigationManager.NavigateTo("/Reportes/Index");
+    }
+}

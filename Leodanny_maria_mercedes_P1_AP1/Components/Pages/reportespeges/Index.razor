@@ -1,0 +1,117 @@
+﻿@page "/Reportes/Index"
+@rendermode InteractiveServer
+@inject ServicesReportes ServicesReportes
+@inject NavigationManager navigationManager
+
+<PageTitle>Consulta de Reportes</PageTitle>
+
+<div class="container">
+    <div class="card shadow-lg">
+        <div class="card-header space-between">
+            <h3 class="card-title">Consulta de reportes</h3>
+            <div class="text-end">
+                <a href="/Reportes/Create" class="btn btn-primary">
+                    <span class="bi bi-plus-square mt-3"></span> Crear
+                </a>
+            </div>
+        </div>
+
+        <div class="card-body">
+            <!-- Filtros de búsqueda -->
+            <div class="row mb-3 align-items-end">
+                <div class="col-md-3">
+                    <label for="Filtro" class="form-label">Filtrar por:</label>
+                    <select @bind="filtro" class="form-select">
+                        <option value="ID">ReporteId</option>
+                        <option value="Persona">Persona</option>
+                        <option value="Monto">Monto</option>
+                    </select>
+                </div>
+
+                <div class="col-md-6">
+                    <label for="ValorFiltro" class="form-label">Búsqueda:</label>
+                    <div class="input-group">
+                        <input @bind="valorFiltro" class="form-control" placeholder="Buscar" />
+                        <button @onclick="Buscar" class="btn btn-outline-primary" type="button">
+                            <span class="bi bi-search"></span> Buscar
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <table class="table table-hover">
+                <thead class="table table-striped text-black text-center">
+                    <tr>
+                        <th>ReporteId</th>
+                        <th>Fecha</th>
+                        <th>Persona</th>
+                        <th>Monto</th>
+                        <th>Observación</th>
+                        <th>Editar</th>
+                        <th>Eliminar</th>
+                    </tr>
+                </thead>
+                <tbody class="text-center">
+                    @foreach (var reporte in listaReportes)
+                    {
+                        <tr>
+                            <td>@reporte.ReporteId</td>
+                            <td>@reporte.Fecha</td>
+                            <td>@reporte.Persona</td>
+                            <td>@reporte.Monto</td>
+                            <td>@reporte.Observacion</td>
+                            <td>
+                                <a href="/Reportes/Edit/@reporte.ReporteId" class="btn bi bi-pencil-square"></a>
+                            </td>
+                            <td>
+                                <a href="/Reportes/Delete/@reporte.ReporteId" class="btn bi bi-trash"></a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class="card-footer space-between">
+            <p>Total de reportes: @listaReportes.Count</p>
+        </div>
+    </div>
+</div>
+
+@code {
+    public reportes reporte = new reportes();
+    public List<reportes> listaReportes = new List<reportes>();
+    private string filtro = "ID";
+    private string valorFiltro = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        listaReportes = await ServicesReportes.Listar(p => true);
+    }
+
+    private async Task Buscar()
+    {
+        if (string.IsNullOrWhiteSpace(valorFiltro))
+        {
+            listaReportes = await ServicesReportes.Listar(p => true);
+            return;
+        }
+
+        switch (filtro)
+        {
+            case "ID":
+                if (int.TryParse(valorFiltro, out int id))
+                    listaReportes = await ServicesReportes.Listar(p => p.ReporteId == id);
+                break;
+            case "Persona":
+                listaReportes = await ServicesReportes.Listar(p => p.Persona.Contains(valorFiltro, StringComparison.OrdinalIgnoreCase));
+                break;
+            case "Monto":
+                if (decimal.TryParse(valorFiltro, out decimal monto))
+                    listaReportes = await ServicesReportes.Listar(p => p.Monto == monto);
+                break;
+            default:
+                listaReportes = await ServicesReportes.Listar(p => true);
+                break;
+        }
+    }
+}
